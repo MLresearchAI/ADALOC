@@ -24,7 +24,7 @@ This repository contains a Python script for training neural networks with a foc
 1. Clone the repository:
 
 ```
-git clone https://github.com/yaojin17/Unlearning_LLM.git
+git clone https://github.com/iamabin/vision_task.git
 cd vision_task
 ```
 
