@@ -55,7 +55,7 @@ This repository provides a unified framework for training and evaluating models 
 To train a model, run the following command with the desired arguments:
 
 ```
-python main.py --dataset cifar100 --model_name densenet121
+python tune_vision.py --dataset cifar100 --model_name densenet121
 ```
 
 #### Arguments
@@ -80,7 +80,7 @@ python main.py --dataset cifar100 --model_name densenet121
 Train a DenseNet121 model on the Caltech256 dataset with pretrained weights, retaining the top 5% of neurons:
 
 ```
-python main.py --dataset caltech256 --model_name densenet121 --pretrain --retained 0.05 --mode 0 --batch_size 64 --num_epochs 50 --lr 0.001 --momentum 0.9
+python tune_vision.py --dataset caltech256 --model_name densenet121 --pretrain --retained 0.05 --mode 0 --batch_size 64 --num_epochs 50 --lr 0.001 --momentum 0.9
 ```
 
 ## NLP task
