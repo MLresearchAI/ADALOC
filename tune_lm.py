@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 def main(args):
-    # Define the datasets to be used
+    # Define the datasets to be used.
     datasets = ["qnli", "sst2", "tweet_eval"]
     # From 1% to 10%
     p_values = [1, 0.05, 0.10]  
