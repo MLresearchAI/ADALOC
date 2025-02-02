@@ -9,32 +9,44 @@ This repository contains a Python script for training neural networks with a foc
 <details><summary>Abstract</summary>
 
 
-This repository contains a Python script for training neural networks with a focus on selected partial neurons. 
+This repository provides a unified framework for training and evaluating models on both vision and natural language processing (NLP) tasks. The project supports multiple datasets and model architectures across two domains, with flexible configuration options for researchers.
 
 </details>
 
 ## Features
 
-- **Multiple Datasets**: Supports training on popular datasets such as CIFAR-10, CIFAR-100, MNIST, FashionMNIST, Flower102, and Caltech256.
-- **Model Architectures**: Includes support for ResNet-18, ResNet-152, DenseNet121, and ConvNeXtV2.
-- **Neuron Selection**: Allows selection of neurons based on different criteria (Top, Random, Bottom) and retains a specified fraction of neurons.
+**Vision Tasks**
+
+- Supports training on popular datasets such as CIFAR-10, CIFAR-100, MNIST, FashionMNIST, Flower102, and Caltech256.
+
+- Includes support for ResNet-18, ResNet-152, DenseNet121, and ConvNeXtV2.
+- Allows selection of neurons based on different criteria (Top, Random, Bottom) and retains a specified fraction of neurons.
+
+**NLP Tasks**
+
+- Supports multiple datasets: `qnli`, `sst2`, `tweet_eval`
+- Adjustable parameter selection for different percentages of data
+- Training and evaluation with different models such as BERT, RoBERTa, and DeBERTa
+- Automatic logging and result storage
+
+## Vision task
 
 ### Environment Setup
 
 1. Clone the repository:
 
-```
-git clone https://github.com/iamabin/vision_task.git
-cd vision_task
-```
+   ```
+   git clone https://github.com/yaojin17/Unlearning_LLM.git
+   cd vision_task
+   ```
 
 2. Install the required packages:
 
-```
-pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-pip install -e .
-pip install -r requirements.txt
-```
+   ```
+   pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+   pip install -e .
+   pip install -r requirements.txt
+   ```
 
 *All experiments are conducted on NVIDIA RTX4090 GPU with 24GB of memory.*
 
@@ -71,7 +83,82 @@ Train a DenseNet121 model on the Caltech256 dataset with pretrained weights, ret
 python main.py --dataset caltech256 --model_name densenet121 --pretrain --retained 0.05 --mode 0 --batch_size 64 --num_epochs 50 --lr 0.001 --momentum 0.9
 ```
 
-## Citation Information
+## NLP task
+
+### Requirements
+
+1. Make sure you have the following dependencies installed:
+
+   ```
+   pip install torch transformers datasets evaluate numpy pandas
+   ```
+
+## Usage
+
+### Running the Script
+
+```bash
+python script.py --model_name <model> --output_path <path> --mode <mode>
+```
+
+### Arguments
+
+| Argument        | Type   | Description                                                  |
+| --------------- | ------ | ------------------------------------------------------------ |
+| `--model_name`  | string | Choose from `bert-base-uncased`, `roberta-base`, `microsoft/deberta-v3-base` |
+| `--output_path` | string | Path to save the final results                               |
+| `--mode`        | string | Choose from `smallest`, `largest`, `random`                  |
+
+### Example Command
+
+```bash
+python script.py --model_name bert-base-uncased --output_path ./results --mode largest
+```
+
+## Script Overview
+
+### Dataset Loading
+
+- The script loads datasets based on the given dataset name.
+- Supported datasets: `qnli`, `sst2`, `tweet_eval`, `rotten_tomatoes`, `yahoo_answers_topics`
+
+### Data Processing
+
+- Tokenization is performed based on dataset content.
+- Selection of a subset of data for training and evaluation.
+
+### Model Training
+
+- Pre-trained models are initialized and fine-tuned.
+- A threshold is set to select top parameters based on absolute values.
+
+### Evaluation
+
+- Models are evaluated using predefined metrics such as accuracy.
+- Results are stored in a CSV file.
+
+## Output
+
+After running the script, the following outputs will be generated:
+
+1. A CSV file containing evaluation results (`final_results.csv`).
+2. Logging directory with performance logs.
+3. Printed evaluation metrics such as accuracy and loss.
+
+## Example Output Format
+
+The resulting CSV file (`final_results.csv`) contains:
+
+| dataset | p    | accuracy | loss |
+| ------- | ---- | -------- | ---- |
+| qnli    | 0.05 | -        | -    |
+| sst2    | 0.1  | -        | -    |
+
+
+
+
+
+Citation Information
 
 If you find this code or dataset useful, please consider citing our paper:
 
