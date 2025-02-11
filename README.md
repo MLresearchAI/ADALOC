@@ -1,46 +1,23 @@
-# Adaptable Usage Control for Evolving AI Models.
+# AdaLoc
 
-This repository contains a Python script for training neural networks with a focus on selected partial neurons. 
-
-[Paper](https://exapme) | [Dataset](https://pytorch.org/vision/stable/datasets.html)
-
-## Abstract
-
-<details><summary>Abstract</summary>
-
-
-This repository provides a unified framework for training and evaluating models on both vision and natural language processing (NLP) tasks. The project supports multiple datasets and model architectures across two domains, with flexible configuration options for researchers.
-
-</details>
+AdaLoc enables secure, adaptable DNN usage control through a localized update using a small, adaptable key. It allows efficient updates to a small subset of parameters while maintaining strong performance and protecting against unauthorized access.
 
 ## Features
 
-**Vision Tasks**
+- **Vision Tasks**: Supports datasets like CIFAR-10, CIFAR-100, MNIST, FashionMNIST, Flower102, and Caltech256. Includes models such as ResNet-18, ResNet-152, DenseNet121, and ConvNeXtV2. Allows neuron selection based on criteria like Top, Random, or Bottom.
+- **NLP Tasks**: Supports datasets such as QNLI, SST-2, and TweetEval. Compatible with BERT, RoBERTa, and DeBERTa models, with automatic logging and result storage.
 
-- Supports training on popular datasets such as CIFAR-10, CIFAR-100, MNIST, FashionMNIST, Flower102, and Caltech256.
-
-- Includes support for ResNet-18, ResNet-152, DenseNet121, and ConvNeXtV2.
-- Allows selection of neurons based on different criteria (Top, Random, Bottom) and retains a specified fraction of neurons.
-
-**NLP Tasks**
-
-- Supports multiple datasets: `qnli`, `sst2`, `tweet_eval`
-- Adjustable parameter selection for different percentages of data
-- Training and evaluation with different models such as BERT, RoBERTa, and DeBERTa
-- Automatic logging and result storage
-
-## Vision task
+## Vision Task
 
 ### Environment Setup
 
 1. Clone the repository:
 
    ```
-   git clone https://github.com/yaojin17/Unlearning_LLM.git
-   cd vision_task
+   git clone https://github.com/MLresearchAI
    ```
 
-2. Install the required packages:
+2. Install required packages:
 
    ```
    pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
@@ -48,57 +25,55 @@ This repository provides a unified framework for training and evaluating models 
    pip install -r requirements.txt
    ```
 
-*All experiments are conducted on NVIDIA RTX4090 GPU with 24GB of memory.*
+### Usage
 
-#### Usage
-
-To train a model, run the following command with the desired arguments:
+To train a model, run the following:
 
 ```
-python tune_vision.py --dataset cifar100 --model_name densenet121
+python tune_v.py --dataset cifar100 --model_name densenet121
 ```
 
-#### Arguments
+### Arguments
 
-- `--device`: Training device (`cuda:0` or `cpu`). Default is `cuda:0` if available, otherwise `cpu`.
-- `--dataset`: Dataset for training. Choices: `cifar100`, `cifar10`, `mnist`, `fashionmnist`, `flower102`, `caltech256`. Default is `cifar100`.
-- `--batch_size`: Default is `64`.
-- `--num_workers`: Default is `6`.
-- `--num_epochs`: Number of training epochs. Default is `50`.
-- `--lr`: Learning rate. Default is `0.001`.
-- `--momentum`: Momentum for SGD optimizer. Default is `0.9`.
-- `--model_name`: Model architecture to use. Choices: `resnet18`, `resnet152`, `densenet121`, `convnextv2`. Default is `densenet121`.
-- `--pretrain`: Use pretrained model weights. Default is `True`.
-- `--num_classes`: Number of output classes. Default is `100` (cifar100).
-- `--retained`: Fraction of neurons to retain. Default is `0.05`.
-- `--mode`: Neuron selection mode. `0` for Top, `1` for Random, `2` for Bottom. Default is `0`.
+- `--device`: Training device (`cuda:0` or `cpu`).
+- `--dataset`: Dataset for training (`cifar100`, `cifar10`, `mnist`, `fashionmnist`, `flower102`, `caltech256`).
+- `--batch_size`: Default `64`.
+- `--num_workers`: Default `6`.
+- `--num_epochs`: Default `50`.
+- `--lr`: Default `0.001`.
+- `--momentum`: Default `0.9`.
+- `--model_name`: Model architecture (`resnet18`, `resnet152`, `densenet121`, `convnextv2`).
+- `--pretrain`: Use pretrained model weights (`True` by default).
+- `--num_classes`: Number of output classes (`100` by default).
+- `--retained`: Fraction of neurons to retain (`0.05` by default).
+- `--mode`: Neuron selection mode (`0` for Top, `1` for Random, `2` for Bottom).
 
-***Note***: For Caltech256 dataset you need to download from [Kaggle](https://www.kaggle.com/datasets/jessicali9530/caltech256).
+**Note**: For the Caltech256 dataset, download it from [Kaggle](https://www.kaggle.com/datasets/jessicali9530/caltech256).
 
 ### Example
 
-Train a DenseNet121 model on the Caltech256 dataset with pretrained weights, retaining the top 5% of neurons:
+To train a DenseNet121 model on the Caltech256 dataset:
 
 ```
-python tune_vision.py --dataset caltech256 --model_name densenet121 --pretrain --retained 0.05 --mode 0 --batch_size 64 --num_epochs 50 --lr 0.001 --momentum 0.9
+python tune_v.py --dataset caltech256 --model_name densenet121 --pretrain --retained 0.05 --mode 0 --batch_size 64 --num_epochs 50 --lr 0.001 --momentum 0.9
 ```
 
-## NLP task
+## NLP Task
 
 ### Requirements
 
-1. Make sure you have the following dependencies installed:
+Ensure the following dependencies are installed:
 
-   ```
-   pip install torch transformers datasets evaluate numpy pandas
-   ```
+```
+pip install torch transformers datasets evaluate numpy pandas
+```
 
-## Usage
+### Usage
 
-### Running the Script
+Run the script as follows:
 
 ```bash
-python script.py --model_name <model> --output_path <path> --mode <mode>
+python tune_l.py --model_name <model> --output_path <path> --mode <mode>
 ```
 
 ### Arguments
@@ -112,40 +87,18 @@ python script.py --model_name <model> --output_path <path> --mode <mode>
 ### Example Command
 
 ```bash
-python script.py --model_name bert-base-uncased --output_path ./results --mode largest
+python tune_l.py --model_name bert-base-uncased --output_path ./results --mode largest
 ```
-
-## Script Overview
-
-### Dataset Loading
-
-- The script loads datasets based on the given dataset name.
-- Supported datasets: `qnli`, `sst2`, `tweet_eval`, `rotten_tomatoes`, `yahoo_answers_topics`
-
-### Data Processing
-
-- Tokenization is performed based on dataset content.
-- Selection of a subset of data for training and evaluation.
-
-### Model Training
-
-- Pre-trained models are initialized and fine-tuned.
-- A threshold is set to select top parameters based on absolute values.
-
-### Evaluation
-
-- Models are evaluated using predefined metrics such as accuracy.
-- Results are stored in a CSV file.
 
 ## Output
 
-After running the script, the following outputs will be generated:
+After running the script, the following outputs are generated:
 
 1. A CSV file containing evaluation results (`final_results.csv`).
-2. Logging directory with performance logs.
-3. Printed evaluation metrics such as accuracy and loss.
+2. A logging directory with performance logs.
+3. Printed evaluation metrics like accuracy and loss.
 
-## Example Output Format
+### Example Output Format
 
 The resulting CSV file (`final_results.csv`) contains:
 
@@ -154,15 +107,29 @@ The resulting CSV file (`final_results.csv`) contains:
 | qnli    | 0.05 | -        | -    |
 | sst2    | 0.1  | -        | -    |
 
+---
+
+## Model Keying 
+
+Our adaptable key is designed to support and integrate seamlessly with a wide range of model keying methods. A demonstration implementation is available in the `model_keying/` directory.
+
+```python
+cd model_keying/
+
+# To split the target model (primary key):
+python locker.py split --model <path_to_model> --ratio <key_ratio> --arch <architecture> --save ./test_output
+
+# To restore the model:
+python locker.py recover --model test_output/keyed_model.pth.tar --key test_output/key.pth.tar --arch <architecture> --save <save_path>
+```
 
 
 
-
-Citation Information
+## Citation Information
 
 If you find this code or dataset useful, please consider citing our paper:
 
 ```bib
-@{comming soon}
+@{coming soon}
 ```
 

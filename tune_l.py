@@ -9,25 +9,18 @@ import numpy as np
 import pandas as pd
 
 def main(args):
-    # Define the datasets to be used.
     datasets = ["qnli", "sst2", "tweet_eval"]
-    # From 1% to 10%
     p_values = [1, 0.05, 0.10]  
-
-    # Store evaluation results
     results = []
 
     for dataset_name in datasets:
-        # Load evaluation metrics
         metric = evaluate.load("glue", dataset_name) if dataset_name in ["mrpc", "sst2", "qnli"] else evaluate.load("accuracy")
 
-        # Define evaluation function
         def compute_metrics(eval_pred):
             logits, labels = eval_pred
             predictions = np.argmax(logits, axis=-1)
             return metric.compute(predictions=predictions, references=labels)
         
-        # Load dataset
         if dataset_name in ["mrpc", "sst2", "qnli"]:
             dataset = load_dataset("glue", dataset_name)
         elif dataset_name == "rotten_tomatoes":
@@ -39,7 +32,6 @@ def main(args):
         else:
             raise ValueError(f"Unsupported dataset: {dataset_name}")
         
-        # Select top p% of data for testing
         def select_percentage(dataset, percentage=1):
             return dataset.select(range(int(len(dataset) * percentage)))
 
@@ -50,10 +42,8 @@ def main(args):
         if "test" in dataset:
             dataset["test"] = select_percentage(dataset["test"])
 
-        # Load tokenizer
         tokenizer = AutoTokenizer.from_pretrained(args.model_name)
 
-        # Data preprocessing function
         def preprocess_function(examples):
             if "sentence1" in examples and "sentence2" in examples:
                 return tokenizer(examples["sentence1"], examples["sentence2"], truncation=True)
@@ -76,10 +66,8 @@ def main(args):
         data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
         for p in p_values:
-            # Initialize the model
             model = AutoModelForSequenceClassification.from_pretrained(args.model_name, num_labels=len(set(train_dataset["label"]))).to("cuda")
 
-            # Select the threshold of the top p% parameters by absolute value
             def select_top_p_neuron_threshold_by_abs(model, p):
                 all_params = torch.cat([p.view(-1) for _, p in model.named_parameters()])
                 abs_params = torch.abs(all_params)
@@ -93,7 +81,6 @@ def main(args):
             threshold = select_top_p_neuron_threshold_by_abs(model, p)
             print(f"Dataset: {dataset_name}, p: {p}, Threshold: {threshold}")
 
-            # Define gradient mask
             def get_masked_grad_hook(mask):
                 def hook_fn(grad):
                     return grad * mask
@@ -105,13 +92,11 @@ def main(args):
                 elif args.mode == "largest":
                     mask = (torch.abs(param.data) >= threshold).float()
                 elif args.mode == "random" and p > 0.05:
-                    # Randomly select 5% if p > 0.05
                     mask = (torch.rand(param.size()) < 0.05).float().to("cuda")
                 else:
                     raise ValueError("Unsupported operation.")
                 param.register_hook(get_masked_grad_hook(mask))
 
-            # Set training arguments
             training_args = TrainingArguments(
                 output_dir=f"{args.output_path}/{args.model_name}/{dataset_name}_p_{p}",
                 num_train_epochs=5,
@@ -136,13 +121,10 @@ def main(args):
                 compute_metrics=compute_metrics,
             )
 
-            # Start training
             trainer.train()
 
-            # Evaluate the model
             metrics = trainer.evaluate()
 
-            # Store results
             results.append({
                 "dataset": dataset_name,
                 "p": p,
@@ -153,7 +135,6 @@ def main(args):
             del model
             torch.cuda.empty_cache()
 
-    # Summarize results into a table
     df = pd.DataFrame(results)
     df.to_csv(args.output_path + "/final_results.csv", index=False)
     print(df.pivot(index="p", columns="dataset", values="accuracy"))
